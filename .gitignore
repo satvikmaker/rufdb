@@ -1,0 +1,32 @@
+# Rust build artifacts
+/target/
+**/target/
+
+# Cargo lock for libraries (consumers should use their own)
+# Uncomment if this is an application:
+# Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Database files created during development/testing
+*.db.json
+db.json
+
+# Node.js bindings
+bindings/node/node_modules/
+bindings/node/*.node
+bindings/node/index.js
+
+# Python bindings
+bindings/python/__pycache__/
+bindings/python/*.so
+bindings/python/*.pyd
+bindings/python/dist/
+bindings/python/build/
+bindings/python/*.egg-info/

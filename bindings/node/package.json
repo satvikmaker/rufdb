@@ -1,0 +1,22 @@
+{
+  "name": "@rsdb/node",
+  "version": "0.1.0",
+  "description": "Node.js bindings for rsdb — a fast, file-system based JSON database written in Rust",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "license": "MIT",
+  "keywords": ["database", "json", "file", "lowdb", "rust", "native", "napi"],
+  "scripts": {
+    "build": "napi build --release",
+    "build:debug": "napi build"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.0.0"
+  },
+  "napi": {
+    "name": "rsdb-node",
+    "triples": {
+      "defaults": true
+    }
+  }
+}
