@@ -3,8 +3,8 @@
 /// Issues 101 concurrent writes (values "0" through "100") and verifies
 /// that after all writes complete, the file contains "100" (the last value).
 /// This validates the write coalescer (steno-equivalent) in async TextFile.
-use rsdb::adapters::TextFile;
-use rsdb::Adapter;
+use rufdb::adapters::TextFile;
+use rufdb::Adapter;
 use tempfile::TempDir;
 
 #[tokio::test]
@@ -35,7 +35,7 @@ async fn race_condition_100_concurrent_writes() {
 
 #[tokio::test]
 async fn race_condition_json_file_concurrent_writes() {
-    use rsdb::adapters::JSONFile;
+    use rufdb::adapters::JSONFile;
     use serde::{Deserialize, Serialize};
 
     #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]

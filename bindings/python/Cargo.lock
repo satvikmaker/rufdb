@@ -150,7 +150,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rsdb"
+name = "rufdb"
 version = "0.1.0"
 dependencies = [
  "serde",
@@ -159,11 +159,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "rsdb-python"
+name = "rufdb-python"
 version = "0.1.0"
 dependencies = [
  "pyo3",
- "rsdb",
+ "rufdb",
  "serde",
  "serde_json",
 ]

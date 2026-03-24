@@ -1,17 +1,17 @@
-//! rsdb CLI — command-line interface for interacting with JSON databases.
+//! rufdb CLI — command-line interface for interacting with JSON databases.
 //!
 //! Usage:
-//!   rsdb <file> get [key.path]        Read the whole DB or a nested key
-//!   rsdb <file> set <key.path> <json>  Set a value at a key path
-//!   rsdb <file> delete <key.path>      Delete a key
-//!   rsdb <file> init [json]            Initialize a new database
+//!   rufdb <file> get [key.path]        Read the whole DB or a nested key
+//!   rufdb <file> set <key.path> <json>  Set a value at a key path
+//!   rufdb <file> delete <key.path>      Delete a key
+//!   rufdb <file> init [json]            Initialize a new database
 //!
 //! Examples:
-//!   rsdb db.json init '{"posts":[],"users":[]}'
-//!   rsdb db.json get
-//!   rsdb db.json get posts
-//!   rsdb db.json set posts '[{"id":1,"title":"Hello"}]'
-//!   rsdb db.json delete posts.0
+//!   rufdb db.json init '{"posts":[],"users":[]}'
+//!   rufdb db.json get
+//!   rufdb db.json get posts
+//!   rufdb db.json set posts '[{"id":1,"title":"Hello"}]'
+//!   rufdb db.json delete posts.0
 
 use std::env;
 use std::process;
@@ -59,20 +59,20 @@ fn main() {
 
 fn print_usage() {
     eprintln!(
-        "rsdb - A fast, file-system based JSON database (Rust implementation of lowdb)
+        "rufdb - A fast, file-system based JSON database (Rust implementation of lowdb)
 
 Usage:
-  rsdb <file> init [json]            Initialize a new database
-  rsdb <file> get [key.path]         Read the whole DB or a nested key
-  rsdb <file> set <key.path> <json>  Set a value at a key path
-  rsdb <file> delete <key.path>      Delete a key
+  rufdb <file> init [json]            Initialize a new database
+  rufdb <file> get [key.path]         Read the whole DB or a nested key
+  rufdb <file> set <key.path> <json>  Set a value at a key path
+  rufdb <file> delete <key.path>      Delete a key
 
 Examples:
-  rsdb db.json init '{{\"posts\":[],\"users\":[]}}'
-  rsdb db.json get
-  rsdb db.json get posts
-  rsdb db.json set posts.0.title '\"Updated Title\"'
-  rsdb db.json delete posts.0"
+  rufdb db.json init '{{\"posts\":[],\"users\":[]}}'
+  rufdb db.json get
+  rufdb db.json get posts
+  rufdb db.json set posts.0.title '\"Updated Title\"'
+  rufdb db.json delete posts.0"
     );
 }
 
@@ -83,8 +83,8 @@ fn cmd_init(
     let default = default_json.unwrap_or("{}");
     let data: serde_json::Value = serde_json::from_str(default)?;
 
-    let adapter = rsdb::adapters::JSONFileSync::<serde_json::Value>::new(file);
-    let db = rsdb::LowSync::new(adapter, data);
+    let adapter = rufdb::adapters::JSONFileSync::<serde_json::Value>::new(file);
+    let db = rufdb::LowSync::new(adapter, data);
     db.write()?;
 
     println!("Initialized {}", file);
@@ -95,9 +95,9 @@ fn cmd_get(
     file: &str,
     key_path: Option<&str>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let adapter = rsdb::adapters::JSONFileSync::<serde_json::Value>::new(file);
+    let adapter = rufdb::adapters::JSONFileSync::<serde_json::Value>::new(file);
     let default = serde_json::Value::Object(serde_json::Map::new());
-    let mut db = rsdb::LowSync::new(adapter, default);
+    let mut db = rufdb::LowSync::new(adapter, default);
     db.read()?;
 
     let value = match key_path {
@@ -117,9 +117,9 @@ fn cmd_set(
 ) -> Result<(), Box<dyn std::error::Error>> {
     let new_value: serde_json::Value = serde_json::from_str(json_value)?;
 
-    let adapter = rsdb::adapters::JSONFileSync::<serde_json::Value>::new(file);
+    let adapter = rufdb::adapters::JSONFileSync::<serde_json::Value>::new(file);
     let default = serde_json::Value::Object(serde_json::Map::new());
-    let mut db = rsdb::LowSync::new(adapter, default);
+    let mut db = rufdb::LowSync::new(adapter, default);
     db.read()?;
 
     set_path(&mut db.data, key_path, new_value)?;
@@ -133,9 +133,9 @@ fn cmd_delete(
     file: &str,
     key_path: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let adapter = rsdb::adapters::JSONFileSync::<serde_json::Value>::new(file);
+    let adapter = rufdb::adapters::JSONFileSync::<serde_json::Value>::new(file);
     let default = serde_json::Value::Object(serde_json::Map::new());
-    let mut db = rsdb::LowSync::new(adapter, default);
+    let mut db = rufdb::LowSync::new(adapter, default);
     db.read()?;
 
     delete_path(&mut db.data, key_path)?;

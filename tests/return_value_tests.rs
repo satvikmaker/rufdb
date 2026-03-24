@@ -1,6 +1,6 @@
 /// Return-value tests — verifies that write() returns Ok(()) on success,
 /// matching lowdb's tests that check `equal(await memory.write(obj), undefined)`.
-use rsdb::{Adapter, Low, LowSync, Memory, MemorySync, SyncAdapter};
+use rufdb::{Adapter, Low, LowSync, Memory, MemorySync, SyncAdapter};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug, PartialEq)]
@@ -80,7 +80,7 @@ fn low_sync_update_returns_ok() {
 async fn text_file_write_returns_ok() {
     let dir = tempfile::TempDir::new().unwrap();
     let path = dir.path().join("ret.txt");
-    let adapter = rsdb::adapters::TextFile::new(&path);
+    let adapter = rufdb::adapters::TextFile::new(&path);
     let result = adapter.write(&"test".to_string()).await;
     assert!(result.is_ok());
 }
@@ -89,7 +89,7 @@ async fn text_file_write_returns_ok() {
 fn text_file_sync_write_returns_ok() {
     let dir = tempfile::TempDir::new().unwrap();
     let path = dir.path().join("ret.txt");
-    let adapter = rsdb::adapters::TextFileSync::new(&path);
+    let adapter = rufdb::adapters::TextFileSync::new(&path);
     let result = adapter.write(&"test".to_string());
     assert!(result.is_ok());
 }
@@ -98,7 +98,7 @@ fn text_file_sync_write_returns_ok() {
 async fn json_file_write_returns_ok() {
     let dir = tempfile::TempDir::new().unwrap();
     let path = dir.path().join("ret.json");
-    let adapter = rsdb::adapters::JSONFile::<Data>::new(&path);
+    let adapter = rufdb::adapters::JSONFile::<Data>::new(&path);
     let result = adapter.write(&Data { value: 1 }).await;
     assert!(result.is_ok());
 }
@@ -107,7 +107,7 @@ async fn json_file_write_returns_ok() {
 fn json_file_sync_write_returns_ok() {
     let dir = tempfile::TempDir::new().unwrap();
     let path = dir.path().join("ret.json");
-    let adapter = rsdb::adapters::JSONFileSync::<Data>::new(&path);
+    let adapter = rufdb::adapters::JSONFileSync::<Data>::new(&path);
     let result = adapter.write(&Data { value: 1 });
     assert!(result.is_ok());
 }

@@ -1,16 +1,16 @@
 [package]
-name = "rsdb-python"
+name = "rufdb-python"
 version = "0.1.0"
 edition = "2021"
-description = "Python bindings for rsdb — a fast, file-system based JSON database"
+description = "Python bindings for rufdb — a fast, file-system based JSON database"
 license = "MIT"
 
 [lib]
-name = "rsdb_py"
+name = "rufdb_py"
 crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = { version = "0.23", features = ["extension-module"] }
-rsdb = { path = "../..", default-features = false }
+rufdb = { path = "../..", default-features = false }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

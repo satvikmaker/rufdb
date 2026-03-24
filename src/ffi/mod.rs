@@ -1,4 +1,4 @@
-//! C-compatible FFI layer for using rsdb from Node.js, Python, Ruby, etc.
+//! C-compatible FFI layer for using rufdb from Node.js, Python, Ruby, etc.
 //!
 //! This module exposes a JSON-in/JSON-out C API that any language with FFI
 //! support can call. The database stores arbitrary JSON (via `serde_json::Value`).
@@ -6,27 +6,27 @@
 //! # Usage from C / shared library consumers
 //!
 //! ```c
-//! void* db = rsdb_open("db.json", "{\"posts\":[]}");
-//! rsdb_read(db);
-//! const char* json = rsdb_get_data(db);
-//! rsdb_set_data(db, "{\"posts\":[{\"title\":\"hello\"}]}");
-//! rsdb_write(db);
-//! rsdb_free_string(json);
-//! rsdb_close(db);
+//! void* db = rufdb_open("db.json", "{\"posts\":[]}");
+//! rufdb_read(db);
+//! const char* json = rufdb_get_data(db);
+//! rufdb_set_data(db, "{\"posts\":[{\"title\":\"hello\"}]}");
+//! rufdb_write(db);
+//! rufdb_free_string(json);
+//! rufdb_close(db);
 //! ```
 //!
 //! # Building
 //!
 //! Build with `cargo build --release --features ffi` to produce:
-//! - `librsdb.dylib` (macOS) / `librsdb.so` (Linux) / `rsdb.dll` (Windows)
-//! - `librsdb.a` (static)
+//! - `librufdb.dylib` (macOS) / `librufdb.so` (Linux) / `rufdb.dll` (Windows)
+//! - `librufdb.a` (static)
 //!
 //! # Safety
 //!
 //! All functions that take a `*mut DbHandle` or `*const DbHandle` return an
 //! error code (or null) if a null pointer is passed. Callers must still ensure
-//! the pointer was obtained from `rsdb_open` and has not been freed via
-//! `rsdb_close`.
+//! the pointer was obtained from `rufdb_open` and has not been freed via
+//! `rufdb_close`.
 
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
@@ -44,7 +44,7 @@ type DbHandle = LowSync<serde_json::Value, JSONFileSync<serde_json::Value>>;
 ///
 /// Returns null on error (including null input pointers or invalid JSON).
 #[no_mangle]
-pub extern "C" fn rsdb_open(
+pub extern "C" fn rufdb_open(
     path: *const c_char,
     default_data_json: *const c_char,
 ) -> *mut DbHandle {
@@ -72,7 +72,7 @@ pub extern "C" fn rsdb_open(
 /// Read data from disk into the database.
 /// Returns 0 on success, -1 on error (including null pointer).
 #[no_mangle]
-pub extern "C" fn rsdb_read(db: *mut DbHandle) -> i32 {
+pub extern "C" fn rufdb_read(db: *mut DbHandle) -> i32 {
     if db.is_null() {
         return -1;
     }
@@ -86,7 +86,7 @@ pub extern "C" fn rsdb_read(db: *mut DbHandle) -> i32 {
 /// Write current data to disk.
 /// Returns 0 on success, -1 on error (including null pointer).
 #[no_mangle]
-pub extern "C" fn rsdb_write(db: *mut DbHandle) -> i32 {
+pub extern "C" fn rufdb_write(db: *mut DbHandle) -> i32 {
     if db.is_null() {
         return -1;
     }
@@ -99,10 +99,10 @@ pub extern "C" fn rsdb_write(db: *mut DbHandle) -> i32 {
 
 /// Get the current data as a JSON string.
 ///
-/// The returned pointer must be freed with `rsdb_free_string`.
+/// The returned pointer must be freed with `rufdb_free_string`.
 /// Returns null on error (including null input pointer).
 #[no_mangle]
-pub extern "C" fn rsdb_get_data(db: *const DbHandle) -> *mut c_char {
+pub extern "C" fn rufdb_get_data(db: *const DbHandle) -> *mut c_char {
     if db.is_null() {
         return std::ptr::null_mut();
     }
@@ -119,7 +119,7 @@ pub extern "C" fn rsdb_get_data(db: *const DbHandle) -> *mut c_char {
 /// Set the database data from a JSON string.
 /// Returns 0 on success, -1 on error (including null pointers or invalid JSON).
 #[no_mangle]
-pub extern "C" fn rsdb_set_data(db: *mut DbHandle, json: *const c_char) -> i32 {
+pub extern "C" fn rufdb_set_data(db: *mut DbHandle, json: *const c_char) -> i32 {
     if db.is_null() || json.is_null() {
         return -1;
     }
@@ -142,7 +142,7 @@ pub extern "C" fn rsdb_set_data(db: *mut DbHandle, json: *const c_char) -> i32 {
 /// Merges the given JSON into the existing data, then writes to disk.
 /// Returns 0 on success, -1 on error (including null pointers or invalid JSON).
 #[no_mangle]
-pub extern "C" fn rsdb_update(db: *mut DbHandle, patch_json: *const c_char) -> i32 {
+pub extern "C" fn rufdb_update(db: *mut DbHandle, patch_json: *const c_char) -> i32 {
     if db.is_null() || patch_json.is_null() {
         return -1;
     }
@@ -164,9 +164,9 @@ pub extern "C" fn rsdb_update(db: *mut DbHandle, patch_json: *const c_char) -> i
     }
 }
 
-/// Free a string returned by `rsdb_get_data`.
+/// Free a string returned by `rufdb_get_data`.
 #[no_mangle]
-pub extern "C" fn rsdb_free_string(s: *mut c_char) {
+pub extern "C" fn rufdb_free_string(s: *mut c_char) {
     if !s.is_null() {
         unsafe {
             let _ = CString::from_raw(s);
@@ -176,7 +176,7 @@ pub extern "C" fn rsdb_free_string(s: *mut c_char) {
 
 /// Close and free the database handle.
 #[no_mangle]
-pub extern "C" fn rsdb_close(db: *mut DbHandle) {
+pub extern "C" fn rufdb_close(db: *mut DbHandle) {
     if !db.is_null() {
         unsafe {
             let _ = Box::from_raw(db);

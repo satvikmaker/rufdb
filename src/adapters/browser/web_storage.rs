@@ -3,7 +3,7 @@ use serde::Serialize;
 use std::marker::PhantomData;
 
 use crate::core::adapter::SyncAdapter;
-use crate::RsdbError;
+use crate::RufDbError;
 
 /// Trait abstracting a key-value string storage backend.
 ///
@@ -25,8 +25,8 @@ pub trait StorageBackend: Send + Sync {
 ///
 /// # Example (native, with HashMap backend)
 /// ```rust
-/// use rsdb::adapters::browser::{WebStorage, StorageBackend};
-/// use rsdb::SyncAdapter;
+/// use rufdb::adapters::browser::{WebStorage, StorageBackend};
+/// use rufdb::SyncAdapter;
 /// use std::collections::HashMap;
 /// use std::sync::RwLock;
 ///
@@ -70,20 +70,20 @@ impl<T> SyncAdapter<T> for WebStorage<T>
 where
     T: Serialize + DeserializeOwned + Send + Sync,
 {
-    fn read(&self) -> Result<Option<T>, RsdbError> {
+    fn read(&self) -> Result<Option<T>, RufDbError> {
         match self.storage.get_item(&self.key) {
             None => Ok(None),
             Some(value) => {
-                let parsed = serde_json::from_str(&value).map_err(RsdbError::Json)?;
+                let parsed = serde_json::from_str(&value).map_err(RufDbError::Json)?;
                 Ok(Some(parsed))
             }
         }
     }
 
-    fn write(&self, data: &T) -> Result<(), RsdbError> {
+    fn write(&self, data: &T) -> Result<(), RufDbError> {
         // Compact JSON — matches lowdb's WebStorage which uses
         // JSON.stringify(obj) without pretty-printing
-        let json = serde_json::to_string(data).map_err(RsdbError::Json)?;
+        let json = serde_json::to_string(data).map_err(RufDbError::Json)?;
         self.storage.set_item(&self.key, &json);
         Ok(())
     }

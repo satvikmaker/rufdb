@@ -1,7 +1,7 @@
-# rsdb vs lowdb: Behavioral Differences
+# rufdb vs lowdb: Behavioral Differences
 
-rsdb is a faithful Rust port of [lowdb](https://github.com/typicode/lowdb). This
-document records the three intentional behavioral divergences where rsdb
+rufdb is a faithful Rust port of [lowdb](https://github.com/typicode/lowdb). This
+document records the three intentional behavioral divergences where rufdb
 improves on lowdb's JavaScript quirks.
 
 ## 1. `read()` uses `Option`, not JavaScript truthiness
@@ -18,9 +18,9 @@ silently discarded and `this.data` retains its previous value. This is a
 JavaScript truthiness quirk — only `null` should be discarded (meaning
 "no data stored yet"), but `0` and `""` are also falsy.
 
-**rsdb:**
+**rufdb:**
 ```rust
-pub async fn read(&mut self) -> Result<(), RsdbError> {
+pub async fn read(&mut self) -> Result<(), RufDbError> {
     let data = self.adapter.read().await?;
     if let Some(d) = data {
         self.data = d;       // ← only None is discarded
@@ -28,12 +28,12 @@ pub async fn read(&mut self) -> Result<(), RsdbError> {
     Ok(())
 }
 ```
-rsdb uses `Option<T>` — only `None` is discarded. All valid values
+rufdb uses `Option<T>` — only `None` is discarded. All valid values
 (including `0`, empty strings, and `false`) are preserved correctly.
 
 **Impact:** If your lowdb database stored a top-level falsy value (rare
 in practice since most databases are objects/arrays), lowdb would silently
-fail to load it. rsdb handles all types correctly.
+fail to load it. rufdb handles all types correctly.
 
 ---
 
@@ -48,16 +48,16 @@ async write(): Promise<void> {
 If `this.data` is falsy (`0`, `""`, `false`), the write is silently
 skipped. This is almost never intentional.
 
-**rsdb:**
+**rufdb:**
 ```rust
-pub async fn write(&self) -> Result<(), RsdbError> {
+pub async fn write(&self) -> Result<(), RufDbError> {
     self.adapter.write(&self.data).await  // ← always writes
 }
 ```
-rsdb unconditionally writes `self.data` to the adapter.
+rufdb unconditionally writes `self.data` to the adapter.
 
 **Impact:** If you set `db.data = 0` (or any falsy value) in lowdb and
-call `write()`, nothing happens. In rsdb, the value is persisted as
+call `write()`, nothing happens. In rufdb, the value is persisted as
 expected.
 
 ---
@@ -79,11 +79,11 @@ read(): T | null {
 lowdb's `MemorySync.read()` uses `||` which converts any falsy stored
 value to `null`. The async `Memory.read()` does not have this bug.
 
-**rsdb:**
+**rufdb:**
 ```rust
 // Both Memory and MemorySync use the same correct logic:
-fn read(&self) -> Result<Option<T>, RsdbError> {
-    let guard = self.data.read().map_err(|e| RsdbError::Lock(e.to_string()))?;
+fn read(&self) -> Result<Option<T>, RufDbError> {
+    let guard = self.data.read().map_err(|e| RufDbError::Lock(e.to_string()))?;
     Ok(guard.clone())   // ← returns the stored value directly
 }
 ```
@@ -94,12 +94,12 @@ stored value without any truthiness coercion.
 
 ## Summary
 
-| Behavior | lowdb | rsdb | Who's correct? |
+| Behavior | lowdb | rufdb | Who's correct? |
 |---|---|---|---|
-| `read()` with falsy data | Discards it | Preserves it | rsdb |
-| `write()` with falsy data | Silently skips | Always writes | rsdb |
-| `MemorySync.read()` with falsy data | Returns `null` | Returns stored value | rsdb |
+| `read()` with falsy data | Discards it | Preserves it | rufdb |
+| `write()` with falsy data | Silently skips | Always writes | rufdb |
+| `MemorySync.read()` with falsy data | Returns `null` | Returns stored value | rufdb |
 
 These differences only affect edge cases where the top-level `data` value
 is a JavaScript "falsy" value. For the common case where `data` is an
-object or array, lowdb and rsdb behave identically.
+object or array, lowdb and rufdb behave identically.

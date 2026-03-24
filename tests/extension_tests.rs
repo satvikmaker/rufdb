@@ -1,11 +1,11 @@
 /// Extension/composition test — equivalent to lowdb's Lodash test.
 ///
-/// Demonstrates that rsdb's `Low` and `LowSync` can be wrapped and
+/// Demonstrates that rufdb's `Low` and `LowSync` can be wrapped and
 /// extended with additional functionality, similar to how lowdb supports
 /// `class LowWithLodash<T> extends Low<T>`.
 ///
 /// In Rust, the idiomatic equivalent is wrapping in a newtype struct.
-use rsdb::{Low, LowSync, Memory, MemorySync};
+use rufdb::{Low, LowSync, Memory, MemorySync};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug, PartialEq)]
@@ -18,14 +18,14 @@ struct Data {
 struct LowWithQuery<T, A>
 where
     T: Send + Sync,
-    A: rsdb::SyncAdapter<T>,
+    A: rufdb::SyncAdapter<T>,
 {
     db: LowSync<T, A>,
 }
 
 impl<A> LowWithQuery<Data, A>
 where
-    A: rsdb::SyncAdapter<Data>,
+    A: rufdb::SyncAdapter<Data>,
 {
     fn new(adapter: A, default_data: Data) -> Self {
         Self {
@@ -49,7 +49,7 @@ where
     }
 
     /// Add a todo and write
-    fn add_todo(&mut self, todo: String) -> Result<(), rsdb::RsdbError> {
+    fn add_todo(&mut self, todo: String) -> Result<(), rufdb::RufDbError> {
         self.db.update(|data| {
             data.todos.push(todo);
         })
@@ -90,14 +90,14 @@ fn extension_wrapper_add_and_persist() {
 struct AsyncLowWithQuery<T, A>
 where
     T: Send + Sync,
-    A: rsdb::Adapter<T>,
+    A: rufdb::Adapter<T>,
 {
     db: Low<T, A>,
 }
 
 impl<A> AsyncLowWithQuery<Data, A>
 where
-    A: rsdb::Adapter<Data>,
+    A: rufdb::Adapter<Data>,
 {
     fn new(adapter: A, default_data: Data) -> Self {
         Self {
@@ -109,7 +109,7 @@ where
         self.db.data.todos.first()
     }
 
-    async fn add_todo(&mut self, todo: String) -> Result<(), rsdb::RsdbError> {
+    async fn add_todo(&mut self, todo: String) -> Result<(), rufdb::RufDbError> {
         self.db
             .update(|data| {
                 data.todos.push(todo);

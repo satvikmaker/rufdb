@@ -1,11 +1,11 @@
-//! Python bindings for rsdb via PyO3.
+//! Python bindings for rufdb via PyO3.
 //!
 //! Exposes a Pythonic API:
 //!
 //! ```python
-//! from rsdb_py import RsDb
+//! from rufdb_py import RufDb
 //!
-//! db = RsDb("db.json", {"posts": [], "users": []})
+//! db = RufDb("db.json", {"posts": [], "users": []})
 //! db.read()
 //! data = db.get_data()
 //! data["posts"].append({"id": 1, "title": "Hello"})
@@ -17,9 +17,9 @@ use pyo3::prelude::*;
 use pyo3::types::{PyAny, PyDict, PyList};
 use std::sync::RwLock;
 
-use ::rsdb::adapters::JSONFileSync;
-use ::rsdb::LowSync;
-use ::rsdb::SyncAdapter;
+use ::rufdb::adapters::JSONFileSync;
+use ::rufdb::LowSync;
+use ::rufdb::SyncAdapter;
 
 /// Convert a Python object to serde_json::Value.
 fn py_to_json(obj: &Bound<'_, PyAny>) -> PyResult<serde_json::Value> {
@@ -85,18 +85,18 @@ fn json_to_py(py: Python<'_>, value: &serde_json::Value) -> PyResult<PyObject> {
     }
 }
 
-fn map_rsdb_err(e: ::rsdb::RsdbError) -> PyErr {
+fn map_rufdb_err(e: ::rufdb::RufDbError) -> PyErr {
     pyo3::exceptions::PyIOError::new_err(e.to_string())
 }
 
 /// A synchronous JSON file database.
 #[pyclass]
-struct RsDb {
+struct RufDb {
     inner: RwLock<LowSync<serde_json::Value, JSONFileSync<serde_json::Value>>>,
 }
 
 #[pymethods]
-impl RsDb {
+impl RufDb {
     #[new]
     fn new(path: String, default_data: &Bound<'_, PyAny>) -> PyResult<Self> {
         let data = py_to_json(default_data)?;
@@ -112,7 +112,7 @@ impl RsDb {
             .write()
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?
             .read()
-            .map_err(map_rsdb_err)
+            .map_err(map_rufdb_err)
     }
 
     fn write(&self) -> PyResult<()> {
@@ -120,7 +120,7 @@ impl RsDb {
             .read()
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?
             .write()
-            .map_err(map_rsdb_err)
+            .map_err(map_rufdb_err)
     }
 
     fn get_data(&self, py: Python<'_>) -> PyResult<PyObject> {
@@ -147,7 +147,7 @@ impl RsDb {
             .write()
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(e.to_string()))?;
         json_merge_patch(&mut inner.data, &patch_json);
-        inner.write().map_err(map_rsdb_err)
+        inner.write().map_err(map_rufdb_err)
     }
 }
 
@@ -156,7 +156,7 @@ fn read_db(py: Python<'_>, path: String, default_data: &Bound<'_, PyAny>) -> PyR
     let data = py_to_json(default_data)?;
     let adapter = JSONFileSync::<serde_json::Value>::new(&path);
     let mut db = LowSync::new(adapter, data);
-    db.read().map_err(map_rsdb_err)?;
+    db.read().map_err(map_rufdb_err)?;
     json_to_py(py, &db.data)
 }
 
@@ -164,12 +164,12 @@ fn read_db(py: Python<'_>, path: String, default_data: &Bound<'_, PyAny>) -> PyR
 fn write_db(path: String, data: &Bound<'_, PyAny>) -> PyResult<()> {
     let json_data = py_to_json(data)?;
     let adapter = JSONFileSync::<serde_json::Value>::new(&path);
-    adapter.write(&json_data).map_err(map_rsdb_err)
+    adapter.write(&json_data).map_err(map_rufdb_err)
 }
 
 #[pymodule]
-fn rsdb_py(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<RsDb>()?;
+fn rufdb_py(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<RufDb>()?;
     m.add_function(wrap_pyfunction!(read_db, m)?)?;
     m.add_function(wrap_pyfunction!(write_db, m)?)?;
     Ok(())

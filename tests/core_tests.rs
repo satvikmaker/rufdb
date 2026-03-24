@@ -1,4 +1,4 @@
-use rsdb::{Low, LowSync, Memory, MemorySync};
+use rufdb::{Low, LowSync, Memory, MemorySync};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Default, Debug, PartialEq)]

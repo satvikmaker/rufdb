@@ -1,5 +1,5 @@
-use rsdb::adapters::{JSONFile, JSONFileSync, TextFile, TextFileSync};
-use rsdb::{Adapter, SyncAdapter};
+use rufdb::adapters::{JSONFile, JSONFileSync, TextFile, TextFileSync};
+use rufdb::{Adapter, SyncAdapter};
 use serde::{Deserialize, Serialize};
 use tempfile::TempDir;
 
@@ -139,7 +139,7 @@ async fn json_file_write_and_read_roundtrip() {
 
 #[test]
 fn data_file_sync_with_custom_format() {
-    use rsdb::adapters::DataFileSync;
+    use rufdb::adapters::DataFileSync;
 
     let dir = TempDir::new().unwrap();
     let path = dir.path().join("custom.csv");

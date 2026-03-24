@@ -1,8 +1,8 @@
 use std::process::Command;
 use tempfile::TempDir;
 
-fn rsdb_cmd() -> Command {
-    Command::new(env!("CARGO_BIN_EXE_rsdb"))
+fn rufdb_cmd() -> Command {
+    Command::new(env!("CARGO_BIN_EXE_rufdb"))
 }
 
 #[test]
@@ -10,7 +10,7 @@ fn cli_init_creates_file() {
     let dir = TempDir::new().unwrap();
     let path = dir.path().join("cli.json");
 
-    let output = rsdb_cmd()
+    let output = rufdb_cmd()
         .args([
             path.to_str().unwrap(),
             "init",
@@ -34,12 +34,12 @@ fn cli_get_reads_whole_db() {
     let path = dir.path().join("get.json");
 
     // Init first
-    rsdb_cmd()
+    rufdb_cmd()
         .args([path.to_str().unwrap(), "init", r#"{"name":"test"}"#])
         .output()
         .unwrap();
 
-    let output = rsdb_cmd()
+    let output = rufdb_cmd()
         .args([path.to_str().unwrap(), "get"])
         .output()
         .unwrap();
@@ -54,7 +54,7 @@ fn cli_get_nested_key() {
     let dir = TempDir::new().unwrap();
     let path = dir.path().join("nested.json");
 
-    rsdb_cmd()
+    rufdb_cmd()
         .args([
             path.to_str().unwrap(),
             "init",
@@ -63,7 +63,7 @@ fn cli_get_nested_key() {
         .output()
         .unwrap();
 
-    let output = rsdb_cmd()
+    let output = rufdb_cmd()
         .args([path.to_str().unwrap(), "get", "user.name"])
         .output()
         .unwrap();
@@ -78,12 +78,12 @@ fn cli_set_value() {
     let dir = TempDir::new().unwrap();
     let path = dir.path().join("set.json");
 
-    rsdb_cmd()
+    rufdb_cmd()
         .args([path.to_str().unwrap(), "init", r#"{"count":0}"#])
         .output()
         .unwrap();
 
-    let output = rsdb_cmd()
+    let output = rufdb_cmd()
         .args([path.to_str().unwrap(), "set", "count", "42"])
         .output()
         .unwrap();
@@ -101,7 +101,7 @@ fn cli_delete_key() {
     let dir = TempDir::new().unwrap();
     let path = dir.path().join("delete.json");
 
-    rsdb_cmd()
+    rufdb_cmd()
         .args([
             path.to_str().unwrap(),
             "init",
@@ -110,7 +110,7 @@ fn cli_delete_key() {
         .output()
         .unwrap();
 
-    let output = rsdb_cmd()
+    let output = rufdb_cmd()
         .args([path.to_str().unwrap(), "delete", "b"])
         .output()
         .unwrap();

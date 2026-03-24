@@ -4,8 +4,8 @@
 /// mock storage backend, matching lowdb's approach of mocking localStorage.
 #[cfg(feature = "wasm")]
 mod browser_tests {
-    use rsdb::adapters::browser::{LocalStorage, SessionStorage, StorageBackend, WebStorage};
-    use rsdb::SyncAdapter;
+    use rufdb::adapters::browser::{LocalStorage, SessionStorage, StorageBackend, WebStorage};
+    use rufdb::SyncAdapter;
     use serde::{Deserialize, Serialize};
     use std::collections::HashMap;
     use std::sync::RwLock;
@@ -98,7 +98,7 @@ mod browser_tests {
 
     #[test]
     fn browser_preset_local_storage() {
-        use rsdb::presets::local_storage_preset;
+        use rufdb::presets::local_storage_preset;
 
         let storage = MockStorage::new();
         let mut db = local_storage_preset("preset-key", TestData { a: 0 }, storage).unwrap();
@@ -109,7 +109,7 @@ mod browser_tests {
 
     #[test]
     fn browser_preset_session_storage() {
-        use rsdb::presets::session_storage_preset;
+        use rufdb::presets::session_storage_preset;
 
         let storage = MockStorage::new();
         let mut db = session_storage_preset("preset-key", TestData { a: 0 }, storage).unwrap();

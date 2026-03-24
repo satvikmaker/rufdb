@@ -241,7 +241,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rsdb"
+name = "rufdb"
 version = "0.1.0"
 dependencies = [
  "serde",

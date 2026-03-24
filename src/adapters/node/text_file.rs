@@ -2,7 +2,7 @@ use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
 
 use crate::core::adapter::SyncAdapter;
-use crate::RsdbError;
+use crate::RufDbError;
 
 #[cfg(feature = "async")]
 mod async_text_file {
@@ -15,7 +15,7 @@ mod async_text_file {
     use tokio::sync::Mutex;
 
     use crate::core::adapter::Adapter;
-    use crate::RsdbError;
+    use crate::RufDbError;
 
     /// Async text file adapter — equivalent to lowdb's `TextFile`.
     ///
@@ -63,7 +63,7 @@ mod async_text_file {
             path: &Path,
             temp_path: &Path,
             data: &str,
-        ) -> Result<(), RsdbError> {
+        ) -> Result<(), RufDbError> {
             if let Some(parent) = path.parent() {
                 tokio::fs::create_dir_all(parent).await?;
             }
@@ -76,13 +76,13 @@ mod async_text_file {
     impl Adapter<String> for TextFile {
         fn read(
             &self,
-        ) -> Pin<Box<dyn Future<Output = Result<Option<String>, RsdbError>> + Send + '_>> {
+        ) -> Pin<Box<dyn Future<Output = Result<Option<String>, RufDbError>> + Send + '_>> {
             let path = self.filename.clone();
             Box::pin(async move {
                 match tokio::fs::read_to_string(&path).await {
                     Ok(content) => Ok(Some(content)),
                     Err(e) if e.kind() == ErrorKind::NotFound => Ok(None),
-                    Err(e) => Err(RsdbError::Io(e)),
+                    Err(e) => Err(RufDbError::Io(e)),
                 }
             })
         }
@@ -90,7 +90,7 @@ mod async_text_file {
         fn write(
             &self,
             data: &String,
-        ) -> Pin<Box<dyn Future<Output = Result<(), RsdbError>> + Send + '_>> {
+        ) -> Pin<Box<dyn Future<Output = Result<(), RufDbError>> + Send + '_>> {
             let data = data.clone();
             let pending = self.pending.clone();
             let write_lock = self.write_lock.clone();
@@ -155,15 +155,15 @@ impl TextFileSync {
 }
 
 impl SyncAdapter<String> for TextFileSync {
-    fn read(&self) -> Result<Option<String>, RsdbError> {
+    fn read(&self) -> Result<Option<String>, RufDbError> {
         match std::fs::read_to_string(&self.filename) {
             Ok(content) => Ok(Some(content)),
             Err(e) if e.kind() == ErrorKind::NotFound => Ok(None),
-            Err(e) => Err(RsdbError::Io(e)),
+            Err(e) => Err(RufDbError::Io(e)),
         }
     }
 
-    fn write(&self, data: &String) -> Result<(), RsdbError> {
+    fn write(&self, data: &String) -> Result<(), RufDbError> {
         // Ensure parent directory exists
         if let Some(parent) = self.filename.parent() {
             std::fs::create_dir_all(parent)?;

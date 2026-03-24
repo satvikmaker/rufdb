@@ -1,5 +1,5 @@
 use crate::core::adapter::{Adapter, SyncAdapter};
-use crate::RsdbError;
+use crate::RufDbError;
 
 /// Async database instance — equivalent to lowdb's `Low<T>` class.
 ///
@@ -8,7 +8,7 @@ use crate::RsdbError;
 ///
 /// # Example
 /// ```ignore
-/// use rsdb::{Low, adapters::Memory};
+/// use rufdb::{Low, adapters::Memory};
 /// use serde::{Serialize, Deserialize};
 ///
 /// #[derive(Serialize, Deserialize, Clone, Default)]
@@ -49,7 +49,7 @@ where
     ///
     /// If the adapter returns `None` (e.g., file not found), `self.data` is
     /// left unchanged — preserving the default data, exactly like lowdb.
-    pub async fn read(&mut self) -> Result<(), RsdbError> {
+    pub async fn read(&mut self) -> Result<(), RufDbError> {
         let data = self.adapter.read().await?;
         if let Some(d) = data {
             self.data = d;
@@ -58,7 +58,7 @@ where
     }
 
     /// Write `self.data` to the adapter.
-    pub async fn write(&self) -> Result<(), RsdbError> {
+    pub async fn write(&self) -> Result<(), RufDbError> {
         self.adapter.write(&self.data).await
     }
 
@@ -70,7 +70,7 @@ where
     ///     data.posts.push("new post".into());
     /// }).await?;
     /// ```
-    pub async fn update<F>(&mut self, f: F) -> Result<(), RsdbError>
+    pub async fn update<F>(&mut self, f: F) -> Result<(), RufDbError>
     where
         F: FnOnce(&mut T),
     {
@@ -107,7 +107,7 @@ where
     /// Read data from the adapter into `self.data`.
     ///
     /// If the adapter returns `None`, `self.data` is left unchanged.
-    pub fn read(&mut self) -> Result<(), RsdbError> {
+    pub fn read(&mut self) -> Result<(), RufDbError> {
         let data = self.adapter.read()?;
         if let Some(d) = data {
             self.data = d;
@@ -116,12 +116,12 @@ where
     }
 
     /// Write `self.data` to the adapter.
-    pub fn write(&self) -> Result<(), RsdbError> {
+    pub fn write(&self) -> Result<(), RufDbError> {
         self.adapter.write(&self.data)
     }
 
     /// Mutate data in-place with a closure, then write.
-    pub fn update<F>(&mut self, f: F) -> Result<(), RsdbError>
+    pub fn update<F>(&mut self, f: F) -> Result<(), RufDbError>
     where
         F: FnOnce(&mut T),
     {

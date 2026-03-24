@@ -177,7 +177,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
 
 [[package]]
-name = "rsdb"
+name = "rufdb"
 version = "0.1.0"
 dependencies = [
  "serde",
@@ -186,13 +186,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "rsdb-node"
+name = "rufdb-node"
 version = "0.1.0"
 dependencies = [
  "napi",
  "napi-build",
  "napi-derive",
- "rsdb",
+ "rufdb",
  "serde",
  "serde_json",
 ]

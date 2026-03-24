@@ -2,14 +2,14 @@ use std::marker::PhantomData;
 use std::path::Path;
 
 use crate::core::adapter::SyncAdapter;
-use crate::RsdbError;
+use crate::RufDbError;
 
 use super::text_file::TextFileSync;
 
 /// Type alias for a boxed parse function.
-type ParseFn<T> = Box<dyn Fn(&str) -> Result<T, RsdbError> + Send + Sync>;
+type ParseFn<T> = Box<dyn Fn(&str) -> Result<T, RufDbError> + Send + Sync>;
 /// Type alias for a boxed stringify function.
-type StringifyFn<T> = Box<dyn Fn(&T) -> Result<String, RsdbError> + Send + Sync>;
+type StringifyFn<T> = Box<dyn Fn(&T) -> Result<String, RufDbError> + Send + Sync>;
 
 #[cfg(feature = "async")]
 mod async_data_file {
@@ -19,7 +19,7 @@ mod async_data_file {
     use std::pin::Pin;
 
     use crate::core::adapter::Adapter;
-    use crate::RsdbError;
+    use crate::RufDbError;
 
     use super::super::text_file::TextFile;
     use super::{ParseFn, StringifyFn};
@@ -51,8 +51,8 @@ mod async_data_file {
         pub fn new<P, PFn, SFn>(filename: P, parse: PFn, stringify: SFn) -> Self
         where
             P: AsRef<Path>,
-            PFn: Fn(&str) -> Result<T, RsdbError> + Send + Sync + 'static,
-            SFn: Fn(&T) -> Result<String, RsdbError> + Send + Sync + 'static,
+            PFn: Fn(&str) -> Result<T, RufDbError> + Send + Sync + 'static,
+            SFn: Fn(&T) -> Result<String, RufDbError> + Send + Sync + 'static,
         {
             Self {
                 text_adapter: TextFile::new(filename),
@@ -69,7 +69,7 @@ mod async_data_file {
     {
         fn read(
             &self,
-        ) -> Pin<Box<dyn Future<Output = Result<Option<T>, RsdbError>> + Send + '_>> {
+        ) -> Pin<Box<dyn Future<Output = Result<Option<T>, RufDbError>> + Send + '_>> {
             Box::pin(async {
                 let text = self.text_adapter.read().await?;
                 match text {
@@ -85,7 +85,7 @@ mod async_data_file {
         fn write(
             &self,
             data: &T,
-        ) -> Pin<Box<dyn Future<Output = Result<(), RsdbError>> + Send + '_>> {
+        ) -> Pin<Box<dyn Future<Output = Result<(), RufDbError>> + Send + '_>> {
             let serialized = (self.stringify)(data);
             Box::pin(async {
                 let s = serialized?;
@@ -118,8 +118,8 @@ where
     pub fn new<P, PFn, SFn>(filename: P, parse: PFn, stringify: SFn) -> Self
     where
         P: AsRef<Path>,
-        PFn: Fn(&str) -> Result<T, RsdbError> + Send + Sync + 'static,
-        SFn: Fn(&T) -> Result<String, RsdbError> + Send + Sync + 'static,
+        PFn: Fn(&str) -> Result<T, RufDbError> + Send + Sync + 'static,
+        SFn: Fn(&T) -> Result<String, RufDbError> + Send + Sync + 'static,
     {
         Self {
             text_adapter: TextFileSync::new(filename),
@@ -134,7 +134,7 @@ impl<T> SyncAdapter<T> for DataFileSync<T>
 where
     T: Send + Sync,
 {
-    fn read(&self) -> Result<Option<T>, RsdbError> {
+    fn read(&self) -> Result<Option<T>, RufDbError> {
         let text = self.text_adapter.read()?;
         match text {
             None => Ok(None),
@@ -145,7 +145,7 @@ where
         }
     }
 
-    fn write(&self, data: &T) -> Result<(), RsdbError> {
+    fn write(&self, data: &T) -> Result<(), RufDbError> {
         let s = (self.stringify)(data)?;
         self.text_adapter.write(&s)
     }

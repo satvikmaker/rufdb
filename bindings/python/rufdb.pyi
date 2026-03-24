@@ -1,12 +1,12 @@
-"""Type stubs for rsdb — a fast, file-system based JSON database."""
+"""Type stubs for rufdb — a fast, file-system based JSON database."""
 
 from typing import Any
 
-class RsDb:
+class RufDb:
     """A synchronous JSON file database.
 
     Example:
-        >>> db = RsDb("db.json", {"posts": [], "users": []})
+        >>> db = RufDb("db.json", {"posts": [], "users": []})
         >>> db.read()
         >>> data = db.get_data()
         >>> data["posts"].append({"id": 1, "title": "Hello"})

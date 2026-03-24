@@ -1,16 +1,16 @@
 [package]
-name = "rsdb"
+name = "rufdb"
 version = "0.1.0"
 edition = "2021"
-authors = ["rsdb contributors"]
+authors = ["rufdb contributors"]
 description = "A small, fast, file-system based JSON database for Rust — inspired by lowdb, written in pure Rust"
 license = "MIT"
-repository = "https://github.com/plandex-ai/rsdb"
+repository = "https://github.com/plandex-ai/rufdb"
 keywords = ["database", "json", "file", "lowdb", "embedded"]
 categories = ["database-implementations", "filesystem"]
 
 [lib]
-name = "rsdb"
+name = "rufdb"
 path = "src/lib.rs"
 # Only "lib" by default. Build with --features ffi for cdylib/staticlib:
 #   cargo build --release --features ffi
@@ -18,7 +18,7 @@ path = "src/lib.rs"
 # (bindings/node and bindings/python) which set their own crate-type.
 
 [[bin]]
-name = "rsdb"
+name = "rufdb"
 path = "src/bin/cli.rs"
 
 [dependencies]

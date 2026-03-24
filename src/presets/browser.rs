@@ -3,7 +3,7 @@ use serde::Serialize;
 
 use crate::adapters::browser::{StorageBackend, WebStorage};
 use crate::core::low::LowSync;
-use crate::RsdbError;
+use crate::RufDbError;
 
 /// Sync preset for localStorage-like storage — equivalent to lowdb's
 /// `LocalStoragePreset<Data>`.
@@ -22,7 +22,7 @@ pub fn local_storage_preset<T, S>(
     key: impl Into<String>,
     default_data: T,
     storage: S,
-) -> Result<LowSync<T, WebStorage<T>>, RsdbError>
+) -> Result<LowSync<T, WebStorage<T>>, RufDbError>
 where
     T: Serialize + DeserializeOwned + Send + Sync + Clone,
     S: StorageBackend + 'static,
@@ -41,7 +41,7 @@ pub fn session_storage_preset<T, S>(
     key: impl Into<String>,
     default_data: T,
     storage: S,
-) -> Result<LowSync<T, WebStorage<T>>, RsdbError>
+) -> Result<LowSync<T, WebStorage<T>>, RufDbError>
 where
     T: Serialize + DeserializeOwned + Send + Sync + Clone,
     S: StorageBackend + 'static,

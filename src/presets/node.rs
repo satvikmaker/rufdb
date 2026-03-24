@@ -5,7 +5,7 @@ use serde::Serialize;
 
 use crate::adapters::memory::MemorySync;
 use crate::core::low::LowSync;
-use crate::RsdbError;
+use crate::RufDbError;
 
 #[cfg(feature = "async")]
 use crate::adapters::JSONFile;
@@ -19,7 +19,7 @@ use crate::core::low::Low;
 /// Check whether we're running in a test environment.
 ///
 /// Mirrors lowdb's `process.env.NODE_ENV === 'test'` behavior.
-/// Checks the `RSDB_TEST_MODE` environment variable. When set to `"1"` or
+/// Checks the `RUFDB_TEST_MODE` environment variable. When set to `"1"` or
 /// `"true"`, presets will use in-memory adapters instead of file I/O.
 ///
 /// This is also automatically true when running under `cargo test`
@@ -27,7 +27,7 @@ use crate::core::low::Low;
 /// presets are called from integration tests (outside the crate), we
 /// rely on the env var for external consumers.
 fn is_test_env() -> bool {
-    match std::env::var("RSDB_TEST_MODE") {
+    match std::env::var("RUFDB_TEST_MODE") {
         Ok(val) => val == "1" || val.eq_ignore_ascii_case("true"),
         Err(_) => false,
     }
@@ -39,11 +39,11 @@ fn is_test_env() -> bool {
 /// from disk (or keeps default), and returns a ready-to-use database.
 ///
 /// For automatic test-mode switching (using in-memory adapters when
-/// `RSDB_TEST_MODE=1`), use [`json_file_preset_auto`] instead.
+/// `RUFDB_TEST_MODE=1`), use [`json_file_preset_auto`] instead.
 ///
 /// # Example
 /// ```ignore
-/// use rsdb::presets::json_file_preset;
+/// use rufdb::presets::json_file_preset;
 /// use serde::{Serialize, Deserialize};
 ///
 /// #[derive(Serialize, Deserialize, Clone, Default)]
@@ -57,7 +57,7 @@ fn is_test_env() -> bool {
 pub async fn json_file_preset<T, P>(
     filename: P,
     default_data: T,
-) -> Result<Low<T, JSONFile<T>>, RsdbError>
+) -> Result<Low<T, JSONFile<T>>, RufDbError>
 where
     T: Serialize + DeserializeOwned + Send + Sync + Clone + 'static,
     P: AsRef<Path>,
@@ -71,14 +71,14 @@ where
 /// Async preset that auto-switches to memory in test mode.
 ///
 /// Returns a type-erased `Low` so it can hold either a JSONFile or Memory
-/// adapter. Use this when you want the `RSDB_TEST_MODE` auto-switch.
+/// adapter. Use this when you want the `RUFDB_TEST_MODE` auto-switch.
 #[cfg(feature = "async")]
 pub async fn json_file_preset_auto<T, P>(
     filename: P,
     default_data: T,
 ) -> Result<
     Low<T, Box<dyn crate::Adapter<T>>>,
-    RsdbError,
+    RufDbError,
 >
 where
     T: Serialize + DeserializeOwned + Send + Sync + Clone + 'static,
@@ -101,7 +101,7 @@ where
 pub fn json_file_sync_preset<T, P>(
     filename: P,
     default_data: T,
-) -> Result<LowSync<T, JSONFileSync<T>>, RsdbError>
+) -> Result<LowSync<T, JSONFileSync<T>>, RufDbError>
 where
     T: Serialize + DeserializeOwned + Send + Sync + Clone,
     P: AsRef<Path>,
@@ -115,14 +115,14 @@ where
 /// Sync preset that auto-switches to memory in test mode.
 ///
 /// Returns a type-erased `LowSync` so it can hold either a JSONFileSync
-/// or MemorySync adapter. Use this when you want the `RSDB_TEST_MODE`
+/// or MemorySync adapter. Use this when you want the `RUFDB_TEST_MODE`
 /// auto-switch, matching lowdb's `NODE_ENV=test` behavior.
 pub fn json_file_sync_preset_auto<T, P>(
     filename: P,
     default_data: T,
 ) -> Result<
     LowSync<T, Box<dyn crate::SyncAdapter<T>>>,
-    RsdbError,
+    RufDbError,
 >
 where
     T: Serialize + DeserializeOwned + Send + Sync + Clone + 'static,

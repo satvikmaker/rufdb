@@ -1,4 +1,4 @@
-use rsdb::presets::{json_file_preset, json_file_sync_preset};
+use rufdb::presets::{json_file_preset, json_file_sync_preset};
 use serde::{Deserialize, Serialize};
 use tempfile::TempDir;
 

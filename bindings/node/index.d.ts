@@ -1,5 +1,5 @@
 /**
- * @rsdb/node — Node.js bindings for rsdb
+ * @rufdb/node — Node.js bindings for rufdb
  *
  * A fast, file-system based JSON database written in Rust.
  * Drop-in replacement for lowdb with native performance.
@@ -10,7 +10,7 @@
  *
  * @example
  * ```typescript
- * const db = new RsDb('db.json', { posts: [], users: [] });
+ * const db = new RufDb('db.json', { posts: [], users: [] });
  * db.read();
  * console.log(db.getData()); // { posts: [], users: [] }
  *
@@ -18,7 +18,7 @@
  * db.write();
  * ```
  */
-export class RsDb {
+export class RufDb {
   /**
    * Create a new database instance.
    * @param path - Path to the JSON file

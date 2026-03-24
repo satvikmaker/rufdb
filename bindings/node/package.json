@@ -1,7 +1,7 @@
 {
-  "name": "@rsdb/node",
+  "name": "@rufdb/node",
   "version": "0.1.0",
-  "description": "Node.js bindings for rsdb — a fast, file-system based JSON database written in Rust",
+  "description": "Node.js bindings for rufdb — a fast, file-system based JSON database written in Rust",
   "main": "index.js",
   "types": "index.d.ts",
   "license": "MIT",
@@ -14,7 +14,7 @@
     "@napi-rs/cli": "^2.0.0"
   },
   "napi": {
-    "name": "rsdb-node",
+    "name": "rufdb-node",
     "triples": {
       "defaults": true
     }

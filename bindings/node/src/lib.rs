@@ -1,12 +1,12 @@
-//! Node.js native bindings for rsdb via napi-rs.
+//! Node.js native bindings for rufdb via napi-rs.
 //!
 //! Exposes a high-level JavaScript API that mirrors lowdb exactly:
 //!
 //! ```javascript
-//! const { RsDb } = require('@rsdb/node');
+//! const { RufDb } = require('@rufdb/node');
 //!
 //! // Create or open a database
-//! const db = new RsDb('db.json', { posts: [], users: [] });
+//! const db = new RufDb('db.json', { posts: [], users: [] });
 //!
 //! // Read from disk
 //! db.read();
@@ -21,9 +21,9 @@
 
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
-use rsdb::adapters::JSONFileSync;
-use rsdb::LowSync;
-use rsdb::SyncAdapter;
+use rufdb::adapters::JSONFileSync;
+use rufdb::LowSync;
+use rufdb::SyncAdapter;
 use std::cell::RefCell;
 
 /// A synchronous JSON file database — the main entry point for Node.js.
@@ -31,12 +31,12 @@ use std::cell::RefCell;
 /// This is the Rust equivalent of lowdb's `LowSync` with a `JSONFileSync`
 /// adapter, exposed as a native Node.js class.
 #[napi]
-pub struct RsDb {
+pub struct RufDb {
     inner: RefCell<LowSync<serde_json::Value, JSONFileSync<serde_json::Value>>>,
 }
 
 #[napi]
-impl RsDb {
+impl RufDb {
     /// Create a new database instance.
     ///
     /// @param path - Path to the JSON file
@@ -58,7 +58,7 @@ impl RsDb {
         self.inner
             .borrow_mut()
             .read()
-            .map_err(|e: rsdb::RsdbError| Error::from_reason(e.to_string()))
+            .map_err(|e: rufdb::RufDbError| Error::from_reason(e.to_string()))
     }
 
     /// Write the current in-memory data to the JSON file.
@@ -67,7 +67,7 @@ impl RsDb {
         self.inner
             .borrow()
             .write()
-            .map_err(|e: rsdb::RsdbError| Error::from_reason(e.to_string()))
+            .map_err(|e: rufdb::RufDbError| Error::from_reason(e.to_string()))
     }
 
     /// Get the current data as a JavaScript object.
@@ -92,7 +92,7 @@ impl RsDb {
     pub fn update(&self, patch: serde_json::Value) -> Result<()> {
         let mut inner = self.inner.borrow_mut();
         json_merge_patch(&mut inner.data, &patch);
-        inner.write().map_err(|e: rsdb::RsdbError| Error::from_reason(e.to_string()))
+        inner.write().map_err(|e: rufdb::RufDbError| Error::from_reason(e.to_string()))
     }
 }
 
@@ -102,7 +102,7 @@ pub fn read_db(path: String, default_data: serde_json::Value) -> Result<serde_js
     let adapter = JSONFileSync::<serde_json::Value>::new(&path);
     let mut db = LowSync::new(adapter, default_data);
     db.read()
-        .map_err(|e: rsdb::RsdbError| Error::from_reason(e.to_string()))?;
+        .map_err(|e: rufdb::RufDbError| Error::from_reason(e.to_string()))?;
     Ok(db.data)
 }
 
@@ -112,7 +112,7 @@ pub fn write_db(path: String, data: serde_json::Value) -> Result<()> {
     let adapter = JSONFileSync::<serde_json::Value>::new(&path);
     adapter
         .write(&data)
-        .map_err(|e: rsdb::RsdbError| Error::from_reason(e.to_string()))
+        .map_err(|e: rufdb::RufDbError| Error::from_reason(e.to_string()))
 }
 
 /// JSON Merge Patch (RFC 7396) implementation.

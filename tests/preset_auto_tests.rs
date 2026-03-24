@@ -1,9 +1,9 @@
 /// Tests for the _auto preset variants that switch to in-memory adapters
-/// when RSDB_TEST_MODE is set — matching lowdb's NODE_ENV=test behavior.
+/// when RUFDB_TEST_MODE is set — matching lowdb's NODE_ENV=test behavior.
 ///
 /// IMPORTANT: These tests modify environment variables and MUST run serially
 /// to avoid race conditions between tests. We use a mutex to ensure this.
-use rsdb::presets::json_file_sync_preset_auto;
+use rufdb::presets::json_file_sync_preset_auto;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 use tempfile::TempDir;
@@ -19,7 +19,7 @@ static ENV_MUTEX: Mutex<()> = Mutex::new(());
 #[test]
 fn sync_preset_auto_uses_file_by_default() {
     let _lock = ENV_MUTEX.lock().unwrap();
-    std::env::remove_var("RSDB_TEST_MODE");
+    std::env::remove_var("RUFDB_TEST_MODE");
 
     let dir = TempDir::new().unwrap();
     let path = dir.path().join("auto.json");
@@ -38,7 +38,7 @@ fn sync_preset_auto_uses_file_by_default() {
 #[test]
 fn sync_preset_auto_uses_memory_in_test_mode() {
     let _lock = ENV_MUTEX.lock().unwrap();
-    std::env::set_var("RSDB_TEST_MODE", "1");
+    std::env::set_var("RUFDB_TEST_MODE", "1");
 
     let dir = TempDir::new().unwrap();
     let path = dir.path().join("auto_test.json");
@@ -49,13 +49,13 @@ fn sync_preset_auto_uses_memory_in_test_mode() {
     // File should NOT exist on disk (we're using memory adapter)
     assert!(!path.exists());
 
-    std::env::remove_var("RSDB_TEST_MODE");
+    std::env::remove_var("RUFDB_TEST_MODE");
 }
 
 #[test]
 fn sync_preset_auto_test_mode_accepts_true_string() {
     let _lock = ENV_MUTEX.lock().unwrap();
-    std::env::set_var("RSDB_TEST_MODE", "true");
+    std::env::set_var("RUFDB_TEST_MODE", "true");
 
     let dir = TempDir::new().unwrap();
     let path = dir.path().join("auto_true.json");
@@ -65,15 +65,15 @@ fn sync_preset_auto_test_mode_accepts_true_string() {
 
     assert!(!path.exists());
 
-    std::env::remove_var("RSDB_TEST_MODE");
+    std::env::remove_var("RUFDB_TEST_MODE");
 }
 
 #[tokio::test]
 async fn async_preset_auto_uses_memory_in_test_mode() {
     let _lock = ENV_MUTEX.lock().unwrap();
-    std::env::set_var("RSDB_TEST_MODE", "1");
+    std::env::set_var("RUFDB_TEST_MODE", "1");
 
-    use rsdb::presets::json_file_preset_auto;
+    use rufdb::presets::json_file_preset_auto;
 
     let dir = TempDir::new().unwrap();
     let path = dir.path().join("async_auto.json");
@@ -85,5 +85,5 @@ async fn async_preset_auto_uses_memory_in_test_mode() {
 
     assert!(!path.exists());
 
-    std::env::remove_var("RSDB_TEST_MODE");
+    std::env::remove_var("RUFDB_TEST_MODE");
 }

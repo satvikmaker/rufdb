@@ -3,7 +3,7 @@ requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "rsdb"
+name = "rufdb"
 version = "0.1.0"
 description = "A fast, file-system based JSON database written in Rust"
 license = { text = "MIT" }

@@ -4,7 +4,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 
 use crate::core::adapter::SyncAdapter;
-use crate::RsdbError;
+use crate::RufDbError;
 
 use super::data_file::DataFileSync;
 
@@ -18,7 +18,7 @@ mod async_json_file {
     use serde::Serialize;
 
     use crate::core::adapter::Adapter;
-    use crate::RsdbError;
+    use crate::RufDbError;
 
     use super::super::data_file::DataFile;
 
@@ -29,7 +29,7 @@ mod async_json_file {
     ///
     /// # Example
     /// ```ignore
-    /// use rsdb::adapters::JSONFile;
+    /// use rufdb::adapters::JSONFile;
     /// use serde::{Serialize, Deserialize};
     ///
     /// #[derive(Serialize, Deserialize, Clone)]
@@ -52,8 +52,8 @@ mod async_json_file {
             Self {
                 inner: DataFile::new(
                     filename,
-                    |s: &str| serde_json::from_str(s).map_err(RsdbError::Json),
-                    |data: &T| serde_json::to_string_pretty(data).map_err(RsdbError::Json),
+                    |s: &str| serde_json::from_str(s).map_err(RufDbError::Json),
+                    |data: &T| serde_json::to_string_pretty(data).map_err(RufDbError::Json),
                 ),
             }
         }
@@ -65,14 +65,14 @@ mod async_json_file {
     {
         fn read(
             &self,
-        ) -> Pin<Box<dyn Future<Output = Result<Option<T>, RsdbError>> + Send + '_>> {
+        ) -> Pin<Box<dyn Future<Output = Result<Option<T>, RufDbError>> + Send + '_>> {
             self.inner.read()
         }
 
         fn write(
             &self,
             data: &T,
-        ) -> Pin<Box<dyn Future<Output = Result<(), RsdbError>> + Send + '_>> {
+        ) -> Pin<Box<dyn Future<Output = Result<(), RufDbError>> + Send + '_>> {
             self.inner.write(data)
         }
     }
@@ -97,8 +97,8 @@ where
         Self {
             inner: DataFileSync::new(
                 filename,
-                |s: &str| serde_json::from_str(s).map_err(RsdbError::Json),
-                |data: &T| serde_json::to_string_pretty(data).map_err(RsdbError::Json),
+                |s: &str| serde_json::from_str(s).map_err(RufDbError::Json),
+                |data: &T| serde_json::to_string_pretty(data).map_err(RufDbError::Json),
             ),
         }
     }
@@ -108,11 +108,11 @@ impl<T> SyncAdapter<T> for JSONFileSync<T>
 where
     T: Serialize + DeserializeOwned + Send + Sync,
 {
-    fn read(&self) -> Result<Option<T>, RsdbError> {
+    fn read(&self) -> Result<Option<T>, RufDbError> {
         self.inner.read()
     }
 
-    fn write(&self, data: &T) -> Result<(), RsdbError> {
+    fn write(&self, data: &T) -> Result<(), RufDbError> {
         self.inner.write(data)
     }
 }

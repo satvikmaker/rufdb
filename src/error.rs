@@ -1,6 +1,6 @@
-/// All errors that can occur in rsdb.
+/// All errors that can occur in rufdb.
 #[derive(Debug, thiserror::Error)]
-pub enum RsdbError {
+pub enum RufDbError {
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
 
